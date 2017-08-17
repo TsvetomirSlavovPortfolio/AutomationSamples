@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using Excel = Microsoft.Office.Interop.Excel;
 
@@ -17,24 +18,34 @@ namespace Framework
 
             int rowCount = xlRange.Rows.Count;
             int colCount = xlRange.Columns.Count;
-            
-            for (int i = 2; i <= rowCount; i++)
-            {
-                var row = new List<string>();
-                for (int j = 1; j <= colCount; j++)
-                {                
-                    row.Add(xlRange.Cells[i, j].Value2.ToString());
-                }
-                //Add a new row to the list
-                ret.Add(new TestCaseData(row.ToArray()));
-                
-            }
-            //Close *.xls
-            xlWorkbook.Close();
-            xlApp.Quit();
-            return ret;
 
-            
+            try
+            {
+                for (int i = 2; i <= rowCount; i++)
+                {
+                    var row = new List<string>();
+                    for (int j = 1; j <= colCount; j++)
+                    {
+                        row.Add(xlRange.Cells[i, j].Value2.ToString());
+                    }
+                    //Add a new row to the list
+                    ret.Add(new TestCaseData(row.ToArray()));
+
+                }
+            }
+            catch (System.Exception e)
+            {
+                Console.WriteLine("Error processing file {0}. Message {1}", ExcelFilePath, e.Message);
+            }
+
+            finally
+            {
+                // Close *.xls
+                xlWorkbook.Close();
+                xlApp.Quit();
+            }
+
+            return ret;
         }
     }
 }
